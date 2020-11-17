@@ -29,6 +29,7 @@ import xyz.rc24.bot.core.entities.Poll;
 import xyz.rc24.bot.core.entities.impl.MiitomoPoll;
 import xyz.rc24.bot.core.entities.impl.UKPollImpl;
 import xyz.rc24.bot.core.entities.impl.USPollImpl;
+import xyz.rc24.bot.core.entities.impl.WorldPollImpl;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,6 +61,7 @@ public class PollManager
         File miitomoFile = new File("miitomo_questions.yml");
         File usFile = new File("polls_049.yml");
         File ukFile = new File("polls_110.yml");
+        File worldFile = new File("polls_world.yml");
 
         if(!(miitomoFile.exists()))
             downloadFile(MIITOMO_FILE, miitomoFile);
@@ -70,12 +72,15 @@ public class PollManager
         if(!(ukFile.exists()))
             downloadFile(UK_FILE, ukFile);
 
+        if(!(worldFile.exists()))
+            downloadFile(WORLD_FILE, worldFile);
+
         Yaml yaml = new Yaml();
         this.polls = new ArrayList<>();
         this.current = new HashSet<>();
 
         populateList(yaml.load(new FileReader(miitomoFile)), yaml.load(new FileReader(usFile)),
-                yaml.load(new FileReader(ukFile)));
+                yaml.load(new FileReader(ukFile)), yaml.load(new FileReader(worldFile)));
 
         this.random = new Random();
 
@@ -122,7 +127,7 @@ public class PollManager
 
     @SuppressWarnings("unchecked")
     private void populateList(List<Map<String, Object>> miitomo, List<Map<String, Object>> us,
-                              List<Map<String, Object>> uk)
+                              List<Map<String, Object>> uk, List<Map<String, Object>> world)
     {
         for(Map<String, Object> data : miitomo)
         {
@@ -147,6 +152,15 @@ public class PollManager
                     getPart(section, "response_1"),
                     getPart(section, "response_2")));
         }
+
+        for(Map<String, Object> data : world)
+        {
+            Map<String, Object> section = (Map<String, Object>) data.get("poll");
+            polls.add(new WorldPollImpl(
+                    getPart(section, "question"),
+                    getPart(section, "response_1"),
+                    getPart(section, "response_2")));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -161,4 +175,6 @@ public class PollManager
             "_data/votes/results_110.yml";
     private final String US_FILE = "https://raw.githubusercontent.com/RiiConnect24/Site/master/" +
             "_data/votes/results_049.yml";
+    private final String WORLD_FILE = "https://raw.githubusercontent.com/RiiConnect24/Site/master/" +
+            "_data/votes/results_world.yml";
 }
