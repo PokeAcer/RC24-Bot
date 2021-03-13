@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ package xyz.rc24.bot;
 
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
+import java.awt.Color;
 import java.util.EnumSet;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGES;
@@ -43,10 +44,11 @@ public class Const
 {
     public static final String VERSION = Const.class.getPackage().getImplementationVersion() == null ? "DEV" :
             Const.class.getPackage().getImplementationVersion();
-    public static final String PATCHING_URL = "http://mtw.rc24.xyz/patch";
     public static final String SUCCESS_E = "✅";
     public static final String WARN_E = "⚠";
     public static final String ERROR_E = "❌";
+
+    public static final Color COLOR = Color.decode("#18B6ED");
 
     public static final EnumSet<GatewayIntent> INTENTS = EnumSet.of(GUILD_MESSAGES,
             GUILD_MESSAGE_REACTIONS, DIRECT_MESSAGES, DIRECT_MESSAGE_REACTIONS);

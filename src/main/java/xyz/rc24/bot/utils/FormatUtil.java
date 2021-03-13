@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ package xyz.rc24.bot.utils;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import xyz.rc24.bot.core.entities.CodeType;
 
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,7 @@ public class FormatUtil
         return out.toString();
     }
 
-    public static String getCodeTypes()
+    /*public static String getCodeTypes()
     {
         StringBuilder response = new StringBuilder("Invalid type! Valid types:\n");
         for(CodeType type : CodeType.values())
@@ -98,7 +97,7 @@ public class FormatUtil
 
         // Remove leftover comma + space
         return response.substring(0, response.length() - 2);
-    }
+    }*/
 
     public static String getCodeLayout(Map<String, String> codes)
     {
@@ -119,5 +118,56 @@ public class FormatUtil
     {
         return msg.replace("@everyone", "@\u0435veryone")
                 .replace("@here", "@h\u0435re");
+    }
+
+    public static String secondsToTime(long timeseconds)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        int years = (int) (timeseconds / (60 * 60 * 24 * 365));
+        if(years > 0)
+        {
+            builder.append("**").append(years).append("** years, ");
+            timeseconds = timeseconds % (60 * 60 * 24 * 365);
+        }
+
+        int weeks = (int) (timeseconds / (60 * 60 * 24 * 365));
+        if(weeks > 0)
+        {
+            builder.append("**").append(weeks).append("** weeks, ");
+            timeseconds = timeseconds % (60 * 60 * 24 * 7);
+        }
+
+        int days = (int) (timeseconds / (60 * 60 * 24));
+        if(days > 0)
+        {
+            builder.append("**").append(days).append("** days, ");
+            timeseconds = timeseconds % (60 * 60 * 24);
+        }
+
+        int hours = (int) (timeseconds / (60 * 60));
+        if(hours > 0)
+        {
+            builder.append("**").append(hours).append("** hours, ");
+            timeseconds = timeseconds % (60 * 60);
+        }
+
+        int minutes = (int) (timeseconds / (60));
+        if(minutes > 0)
+        {
+            builder.append("**").append(minutes).append("** minutes, ");
+            timeseconds = timeseconds % (60);
+        }
+
+        if(timeseconds > 0)
+            builder.append("**").append(timeseconds).append("** seconds");
+
+        String str = builder.toString();
+        if(str.endsWith(", "))
+            str = str.substring(0, str.length() - 2);
+        if(str.equals(""))
+            str = "**No time**";
+
+        return str;
     }
 }

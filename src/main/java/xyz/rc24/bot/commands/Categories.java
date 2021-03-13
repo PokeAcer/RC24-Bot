@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,9 @@ import com.jagrosh.jdautilities.command.Command.Category;
 
 public class Categories
 {
-    public static final Category ADMIN = new Category("Bot Administration");
-    public static final Category GENERAL = new Category("General");
-    public static final Category TOOLS = new Category("Tools");
-    public static final Category WII = new Category("Wii-related");
+    public static final Category BOT       = new Category("Bot");
+    public static final Category BOT_ADMIN = new Category("Bot Administration");
+    public static final Category GENERAL   = new Category("General");
+    public static final Category TOOLS     = new Category("Tools");
+    public static final Category WII       = new Category("Wii-related");
 }

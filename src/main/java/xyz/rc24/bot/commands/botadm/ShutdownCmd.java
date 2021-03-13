@@ -22,36 +22,37 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.commands.botadm;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
 /**
- * @author Artuto
+ * @author Spotlight
  */
-
-public class SearcherUtil
+@RegistrableCommand
+public class ShutdownCmd extends Command
 {
-    public static Member findMember(CommandEvent event, String args)
+    public ShutdownCmd()
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.name = "shutdown";
+        this.help = "Turns the bot off";
+        this.category = Categories.BOT_ADMIN;
+        this.ownerCommand = true;
+        this.guildOnly = false;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    @Override
+    protected void execute(CommandEvent event)
+    {
+        event.getTextChannel().sendMessage("Done! Cya \uD83D\uDC4B")
+                .submit()
+                .whenComplete((s, e) ->
+                {
+                    event.getJDA().shutdown();
+                    System.exit(0);
+                });
     }
 }

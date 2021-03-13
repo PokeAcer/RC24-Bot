@@ -22,36 +22,34 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.core;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
+ * Easy cache builder for our needs.
+ *
  * @author Artuto
  */
 
-public class SearcherUtil
+public class SimpleCacheBuilder<K, V>
 {
-    public static Member findMember(CommandEvent event, String args)
+    private int expireHours = 1;
+
+    public SimpleCacheBuilder() {}
+
+    public SimpleCacheBuilder(int expireHours)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.expireHours = expireHours;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    public <K1 extends K, V1 extends V> Cache<K1, V1> build()
+    {
+        return CacheBuilder.newBuilder()
+                .expireAfterAccess(expireHours, TimeUnit.HOURS)
+                .maximumSize(500).build();
     }
 }

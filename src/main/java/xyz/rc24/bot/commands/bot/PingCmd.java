@@ -22,36 +22,33 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.commands.bot;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
 /**
  * @author Artuto
  */
 
-public class SearcherUtil
+@RegistrableCommand
+public class PingCmd extends Command
 {
-    public static Member findMember(CommandEvent event, String args)
+    public PingCmd()
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.name = "ping";
+        this.help = "Checks the bot's connection to Discord's servers.";
+        this.category = Categories.BOT;
+        this.guildOnly = false;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    @Override
+    protected void execute(CommandEvent event)
+    {
+        event.getJDA().getRestPing().queue(ping ->
+                event.replyFormatted("Gateway Ping: %dms, Discord API Ping: %dms",
+                        event.getJDA().getGatewayPing(), ping));
     }
 }

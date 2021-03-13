@@ -22,36 +22,49 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.commands.tools;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.Permission;
+import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+@RegistrableCommand
+public class BlocksCmd extends Command
 {
-    public static Member findMember(CommandEvent event, String args)
+    public BlocksCmd()
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.name = "blocks";
+        this.help = "Convert between Nintendo blocks and MBs.";
+        this.category = Categories.TOOLS;
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.guildOnly = false;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
+    @Override
+    protected void execute(CommandEvent event)
+    {
+        if(event.getArgs().isEmpty())
         {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
+            event.reply("\u2139 1 block is 128kb\n8 blocks are 1MB");
+            return;
         }
 
-        return found.get(0);
+        double blocks = parseNumber(event.getArgs());
+        if(blocks < 1)
+        {
+            event.replyError("Invalid number!");
+            return;
+        }
+
+        double mb = blocks * 128 / 1024;
+        event.reply("\u2139 " + blocks + " blocks are " + mb + "MB");
+    }
+
+    private double parseNumber(String args)
+    {
+        try {return Double.parseDouble(args);}
+        catch(NumberFormatException e) {return -1.0;}
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@
 
 package xyz.rc24.bot;
 
-import ch.qos.logback.classic.Logger;
-import net.dv8tion.jda.api.requests.RestAction;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Bot entry point.
@@ -37,47 +37,27 @@ import java.io.IOException;
  * @author Artuto
  */
 
+@SpringBootApplication
+@EnableScheduling
+@ComponentScan("xyz.rc24.bot")
 public class RiiConnect24Bot
 {
-    private static Bot instance;
-
-    private static final Logger logger = (Logger) LoggerFactory.getLogger("RiiConnect24 Bot");
-
-    public static void main(String[] args) throws LoginException, IOException
+    public static void main(String[] args)
     {
         // Sentry
-        System.setProperty("sentry.stacktrace.app.packages", "xyz.rc24.bot");
         System.setProperty("sentry.release", Const.VERSION);
 
-        // JDA
-        RestAction.setPassContext(true); // enable context by default
-        RestAction.setDefaultFailure(Throwable::printStackTrace);
-
         getLogger().info("Starting RiiConnect24 Bot - {}", Const.VERSION);
-
-        new Bot().run();
-    }
-
-    public static Bot getInstance()
-    {
-        if(instance == null)
-            throw new IllegalStateException("The bot is not initialized!");
-
-        return instance;
+        SpringApplication.run(RiiConnect24Bot.class, args);
     }
 
     public static Logger getLogger()
     {
+        if(logger == null)
+            logger = LoggerFactory.getLogger("RiiConnect24 Bot");
+
         return logger;
     }
 
-    public static Logger getLogger(Class clazz)
-    {
-        return (Logger) LoggerFactory.getLogger(clazz);
-    }
-
-    static void setInstance(Bot instance)
-    {
-        RiiConnect24Bot.instance = instance;
-    }
+    private static Logger logger;
 }

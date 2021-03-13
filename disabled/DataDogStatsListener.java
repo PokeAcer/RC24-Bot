@@ -22,36 +22,40 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.listeners;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import com.jagrosh.jdautilities.command.CommandListener;
+import com.timgroup.statsd.StatsDClient;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+public class DataDogStatsListener extends ListenerAdapter implements CommandListener
 {
-    public static Member findMember(CommandEvent event, String args)
+    private final StatsDClient statsd;
+
+    public DataDogStatsListener(StatsDClient statsd)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.statsd = statsd;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+    @Override
+    public void onGuildJoin(GuildJoinEvent event)
+    {
+        statsd.recordGaugeValue("guilds", event.getJDA().getGuildCache().size());
+    }
 
-        return found.get(0);
+    @Override
+    public void onGuildLeave(GuildLeaveEvent event)
+    {
+        statsd.recordGaugeValue("guilds", event.getJDA().getGuildCache().size());
+    }
+
+    @Override
+    public void onCommand(CommandEvent event, Command command)
+    {
+        statsd.incrementCounter("commands");
     }
 }

@@ -22,36 +22,19 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.db.dao;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+public class BotDao<T>
 {
-    public static Member findMember(CommandEvent event, String args)
+    private final T dao;
+
+    public BotDao(T dao)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.dao = dao;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    public T get()
+    {
+        return dao;
     }
 }

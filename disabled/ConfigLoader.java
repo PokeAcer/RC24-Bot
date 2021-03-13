@@ -22,36 +22,47 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.config;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import org.yaml.snakeyaml.Yaml;
+import xyz.rc24.bot.Bot;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
-/**
- * @author Artuto
- */
+import static xyz.rc24.bot.RiiConnect24Bot.getLogger;
 
-public class SearcherUtil
+public class ConfigLoader
 {
-    public static Member findMember(CommandEvent event, String args)
+    public static Config init()
     {
-        if(args.isEmpty())
-            return event.getMember();
+        Yaml yaml = new Yaml();
+        File file = new File("config.yml");
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
+        if(!(file.exists()))
         {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
+            try(InputStream is = Bot.class.getResourceAsStream("/config.yml"))
+            {
+                Files.copy(is, file.toPath());
+                getLogger().info("The config file has been generated, please edit it.");
+                System.exit(0);
+            }
+            catch(IOException e)
+            {
+                throw new RuntimeException("Failed to copy config file:", e);
+            }
         }
 
-        return found.get(0);
+        try(InputStream is = new FileInputStream(file))
+        {
+            return yaml.loadAs(is, Config.class);
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException("Failed to load config file:", e);
+        }
     }
 }

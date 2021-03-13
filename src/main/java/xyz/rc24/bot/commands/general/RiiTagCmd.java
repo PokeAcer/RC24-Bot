@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 
 package xyz.rc24.bot.commands.general;
 
-import ch.qos.logback.classic.Logger;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,21 +36,23 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import xyz.rc24.bot.Bot;
-import xyz.rc24.bot.RiiConnect24Bot;
+import org.springframework.beans.factory.annotation.Autowired;
 import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 import xyz.rc24.bot.utils.SearcherUtil;
 
 import java.awt.Color;
 import java.io.IOException;
 
+@RegistrableCommand
 public class RiiTagCmd extends Command
 {
-    private final Logger logger;
-    private final OkHttpClient httpClient;
-    private final String URL = "https://tag.rc24.xyz/%s/tag.max.png?randomizer=%f";
+    @Autowired
+    private OkHttpClient httpClient;
 
-    public RiiTagCmd(Bot bot)
+    //private final Logger logger;
+
+    public RiiTagCmd()
     {
         this.name = "riitag";
         this.help = "Gets a user's RiiTag";
@@ -59,8 +60,7 @@ public class RiiTagCmd extends Command
         this.aliases = new String[]{"tag"};
         this.category = Categories.GENERAL;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.logger = RiiConnect24Bot.getLogger(RiiTagCmd.class);
-        this.httpClient = bot.getHttpClient();
+        //this.logger = LoggerFactory.getLogger(RiiTagCmd.class);
     }
 
     @Override
@@ -73,7 +73,11 @@ public class RiiTagCmd extends Command
                 return;
 
             User user = member.getUser();
-            Request request = new Request.Builder().url(String.format(URL, user.getId(), 0D)).build();
+            Request request = new Request.Builder()
+                    .head()
+                    .url(String.format(URL, user.getId(), 0D))
+                    .build();
+
             httpClient.newCall(request).enqueue(new Callback()
             {
                 @Override
@@ -122,4 +126,6 @@ public class RiiTagCmd extends Command
 
         event.reply(embedBuilder.build());
     }
+
+    private final String URL = "https://tag.rc24.xyz/%s/tag.max.png?randomizer=%f";
 }

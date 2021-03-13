@@ -22,36 +22,41 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.database;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import co.aikar.idb.DbRow;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
+ * Data manager for Morpher
+ *
  * @author Artuto
  */
 
-public class SearcherUtil
+public class MorpherDataManager
 {
-    public static Member findMember(CommandEvent event, String args)
+    private final Database db;
+
+    public MorpherDataManager(Database db)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.db = db;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+    public void setAssociation(long rootMsg, long mirrorMsg)
+    {
+        db.doInsert("INSERT INTO morpher VALUES(?, ?)", rootMsg, mirrorMsg);
+    }
 
-        return found.get(0);
+    public long getAssociation(long rootMsg)
+    {
+        Optional<DbRow> optRow = db.getRow("SELECT * FROM morpher WHERE root_msg_id = ?", rootMsg);
+
+        return optRow.map(dbRow -> dbRow.getLong("mirror_msg_id")).orElse(0L);
+    }
+
+    public void removeAssociation(long rootMsg)
+    {
+        db.doDelete("DELETE FROM morpher WHERE root_msg_id = ?", rootMsg);
     }
 }

@@ -22,36 +22,28 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.config.bot;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+@Configuration
+@ConfigurationProperties("bot")
+public class BotConfig
 {
-    public static Member findMember(CommandEvent event, String args)
+    @NestedConfigurationProperty
+    private final JDAConfig jdaConfig;
+
+    @Autowired
+    public BotConfig(JDAConfig jdaConfig)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.jdaConfig = jdaConfig;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    public JDAConfig getJDAConfig()
+    {
+        return jdaConfig;
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,12 @@ package xyz.rc24.bot.commands.wii;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
 /**
  * @author Artuto
  */
-
+@RegistrableCommand
 public class WadsCmd extends Command
 {
     public WadsCmd()
@@ -45,6 +46,7 @@ public class WadsCmd extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        event.reply("Check out the patcher here: https://github.com/RiiConnect24/RiiConnect24-Patcher/releases/latest");
+        event.reply("Check out the patcher here: " +
+                "<https://github.com/RiiConnect24/RiiConnect24-Patcher/releases/latest>");
     }
 }

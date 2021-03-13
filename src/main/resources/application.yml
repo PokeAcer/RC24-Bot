@@ -1,0 +1,17 @@
+bot:
+  jda:
+    token: ""
+    owner:
+    coOwners:
+    onlineStatus: ONLINE
+    activity: "type !help"
+
+spring:
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://localhost:3306/bot
+    username: root
+    password: changeme
+
+sentry:
+  dsn: ""

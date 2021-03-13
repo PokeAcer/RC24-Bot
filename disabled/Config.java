@@ -22,36 +22,35 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.config;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import net.dv8tion.jda.api.OnlineStatus;
 
 /**
  * @author Artuto
  */
 
-public class SearcherUtil
+public class Config
 {
-    public static Member findMember(CommandEvent event, String args)
+    public String token, prefix;
+
+    public OnlineStatus status;
+    public String playing;
+
+    public long owner;
+    public String[] coOwners;
+
+    public boolean debug;
+
+    public boolean birthdays, sentry, datadog;
+    public long birthdaysChannel, datadogPort;
+    public String sentryDSN, datadogPrefix, datadogHost;
+
+    public boolean useSSL;
+    public String database, databaseHost, databaseUser, databasePassword;
+
+    public String getPlaying()
     {
-        if(args.isEmpty())
-            return event.getMember();
-
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+        return playing.replace("{prefix}", prefix);
     }
 }

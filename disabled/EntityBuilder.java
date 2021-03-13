@@ -22,36 +22,31 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.core.entities;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import co.aikar.idb.DbRow;
+import xyz.rc24.bot.core.entities.impl.GuildSettingsImpl;
 
 /**
+ * Builder for common entities
+ *
  * @author Artuto
  */
 
-public class SearcherUtil
+public class EntityBuilder
 {
-    public static Member findMember(CommandEvent event, String args)
+    public GuildSettings buildGuildSettings(DbRow row)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        CodeType defAdd = CodeType.fromId(row.getInt("default_add", 5));
+        String prefix = row.getString("prefix");
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+        return new GuildSettingsImpl(defAdd,
+                row.getLong("guild_id", 0L),
+                prefix);
+    }
 
-        return found.get(0);
+    public GuildSettings buildDefaultGuildSettings(long id)
+    {
+        return new GuildSettingsImpl(CodeType.WII, id, null);
     }
 }

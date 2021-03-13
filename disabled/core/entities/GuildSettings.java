@@ -22,36 +22,13 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.core.entities;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+public interface GuildSettings
 {
-    public static Member findMember(CommandEvent event, String args)
-    {
-        if(args.isEmpty())
-            return event.getMember();
+    CodeType getDefaultAddType();
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+    long getGuildId();
 
-        return found.get(0);
-    }
+    String getPrefix();
 }

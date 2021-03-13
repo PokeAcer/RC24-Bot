@@ -22,36 +22,24 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.core;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Guild;
+import xyz.rc24.bot.core.entities.CodeType;
+import xyz.rc24.bot.core.entities.GuildSettings;
 
-import java.util.List;
+import java.util.Map;
 
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+@SuppressWarnings("unused")
+public interface BotCore
 {
-    public static Member findMember(CommandEvent event, String args)
-    {
-        if(args.isEmpty())
-            return event.getMember();
+    GuildSettings getGuildSettings(Guild guild);
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+    GuildSettings getGuildSettings(long guild);
 
-        return found.get(0);
-    }
+    Map<CodeType, Map<String, String>> getAllCodes(long user);
+
+    Map<String, String> getCodesForType(CodeType type, long user);
+
+    String getFlag(long user);
 }

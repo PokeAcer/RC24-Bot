@@ -22,36 +22,18 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.config;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import okhttp3.OkHttpClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
-/**
- * @author Artuto
- */
-
-public class SearcherUtil
+@Configuration
+public class ServiceConfig
 {
-    public static Member findMember(CommandEvent event, String args)
+    @Bean
+    public OkHttpClient httpClient()
     {
-        if(args.isEmpty())
-            return event.getMember();
-
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+        return new OkHttpClient();
     }
 }

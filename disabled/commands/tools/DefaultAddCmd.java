@@ -22,36 +22,47 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.commands.tools;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import net.dv8tion.jda.api.Permission;
+import xyz.rc24.bot.Bot;
+import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.core.entities.CodeType;
+import xyz.rc24.bot.database.GuildSettingsDataManager;
+import xyz.rc24.bot.utils.FormatUtil;
 
 /**
  * @author Artuto
  */
 
-public class SearcherUtil
+public class DefaultAddCmd extends Command
 {
-    public static Member findMember(CommandEvent event, String args)
+    private GuildSettingsDataManager dataManager;
+
+    public DefaultAddCmd(Bot bot)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.dataManager = bot.getGuildSettingsDataManager();
+        this.name = "defaultadd";
+        this.help = "Changes the default `add` command's type.";
+        this.category = Categories.TOOLS;
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
+    @Override
+    protected void execute(CommandEvent event)
+    {
+        CodeType type = CodeType.fromCode(event.getArgs());
+        if(type == CodeType.UNKNOWN)
         {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
+            event.replyError(FormatUtil.getCodeTypes());
+            return;
         }
 
-        return found.get(0);
+        if(dataManager.setDefaultAddType(type, event.getGuild().getIdLong()))
+            event.replySuccess("Successfully set `" + type.getName() + "` as default `add` type!");
+        else
+            event.replyError("Error whilst updating the default add type! Please contact a developer.");
     }
 }

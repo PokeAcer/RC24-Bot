@@ -22,36 +22,31 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.commands.wii;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import java.util.List;
+import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
 /**
  * @author Artuto
  */
-
-public class SearcherUtil
+@RegistrableCommand
+public class WiiWareCmd extends Command
 {
-    public static Member findMember(CommandEvent event, String args)
+    public WiiWareCmd()
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.name = "wiiware";
+        this.help = "Lets you know the URL to the WiiWare patcher.";
+        this.category = Categories.WII;
+        this.guildOnly = false;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
-
-        return found.get(0);
+    @Override
+    protected void execute(CommandEvent event)
+    {
+        event.reply("Check out the patcher here: " +
+                "<https://github.com/RiiConnect24/auto-wiiware-patcher/releases/latest>");
     }
 }

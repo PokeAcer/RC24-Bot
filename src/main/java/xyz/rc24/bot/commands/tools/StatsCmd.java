@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017-2020 RiiConnect24 and its contributors
+ * Copyright (c) 2017-2021 RiiConnect24 and its contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 
 package xyz.rc24.bot.commands.tools;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,34 +36,38 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.rc24.bot.Bot;
+import org.springframework.beans.factory.annotation.Autowired;
 import xyz.rc24.bot.Const;
 import xyz.rc24.bot.commands.Categories;
+import xyz.rc24.bot.commands.RegistrableCommand;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.TreeSet;
 
+@RegistrableCommand
 public class StatsCmd extends Command
 {
-    private final Logger logger = LoggerFactory.getLogger("Stats Command");
-    private final OkHttpClient httpClient;
+    @Autowired
+    private Gson gson;
+    @Autowired
+    private OkHttpClient httpClient;
 
-    public StatsCmd(Bot bot)
+    private final Logger logger;
+
+    public StatsCmd()
     {
         this.name = "stats";
         this.help = "Shows stats for the RC24 services";
         this.category = Categories.TOOLS;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.ownerCommand = false;
-        this.guildOnly = true;
+        this.guildOnly = false;
 
-        this.httpClient = bot.getHttpClient();
+        this.logger = LoggerFactory.getLogger("Stats Command");
     }
 
     @Override
@@ -112,7 +118,7 @@ public class StatsCmd extends Command
     @SuppressWarnings("ConstantConditions")
     private String parseJSON(Response response)
     {
-        JSONObject json = new JSONObject(new JSONTokener(response.body().byteStream()));
+        JsonObject json = gson.fromJson(new InputStreamReader(response.body().byteStream()), JsonObject.class);
         Set<String> keys = new TreeSet<>(json.keySet());
 
         StringBuilder green = new StringBuilder();
@@ -120,9 +126,9 @@ public class StatsCmd extends Command
         StringBuilder red = new StringBuilder();
         StringBuilder sb = new StringBuilder();
 
-        keys.forEach(k ->
+        for(String k : keys)
         {
-            String status = json.getString(k);
+            String status = json.get(k).getAsString();
 
             switch(status)
             {
@@ -135,10 +141,11 @@ public class StatsCmd extends Command
                 default:
                     red.append("- ").append(k).append("\n");
             }
-        });
+        }
 
         sb.append("Supported by RiiConnect24:\n")
-                .append("```diff\n").append(green).append("```\nIn progress...\n")
+                .append("```diff\n").append(green.toString().isEmpty() ? "None!" : green)
+                .append("```\nIn progress...\n")
                 .append("```fix\n").append(yellow.toString().isEmpty() ? "None!" : yellow)
                 .append("```\nNot supported:\n")
                 .append("```diff\n").append(red.toString().isEmpty() ? "None!" : red).append("\n```");

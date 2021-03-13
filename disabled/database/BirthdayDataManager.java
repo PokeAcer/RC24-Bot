@@ -22,36 +22,53 @@
  * SOFTWARE.
  */
 
-package xyz.rc24.bot.utils;
+package xyz.rc24.bot.database;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.Member;
+import co.aikar.idb.DbRow;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
+ * Data manager for Birthdays
+ *
  * @author Artuto
  */
 
-public class SearcherUtil
+public class BirthdayDataManager
 {
-    public static Member findMember(CommandEvent event, String args)
+    private final Database db;
+
+    public BirthdayDataManager(Database db)
     {
-        if(args.isEmpty())
-            return event.getMember();
+        this.db = db;
+    }
 
-        List<Member> found = FinderUtil.findMembers(args, event.getGuild());
-        if(found.isEmpty())
-        {
-            event.replyWarning("No members found matching \"" + args + "\"");
-            return null;
-        }
-        else if(found.size() > 1)
-        {
-            event.replyWarning(FormatUtil.listOfMembers(found, args));
-            return null;
-        }
+    public boolean setBirthday(long userId, String date)
+    {
+        return db.doInsert("INSERT INTO birthdays VALUES(?, ?) " +
+                "ON DUPLICATE KEY UPDATE day = ?", userId, date, date);
+    }
 
-        return found.get(0);
+    public String getBirthday(long userId)
+    {
+        Optional<DbRow> optRow = db.getRow("SELECT * FROM birthdays WHERE user_id = ?", userId);
+
+        return optRow.map(dbRow -> dbRow.getString("day")).orElse(null);
+    }
+
+    public List<Long> getPeopleWithDate(String date)
+    {
+        Optional<List<DbRow>> optRows = db.getRows("SELECT * FROM birthdays WHERE day = ?", date);
+        if(!(optRows.isPresent()))
+            return Collections.emptyList();
+
+        List<Long> ids = new ArrayList<>();
+        for(DbRow row : optRows.get())
+            ids.add(row.getLong("user_id"));
+
+        return ids;
     }
 }

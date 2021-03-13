@@ -25,9 +25,6 @@ hs_err_pid*
 *.yml
 
 # Other things
-target/*
-.idea/*
+target/
+.idea/
 *.iml
-dependency-reduced-pom.xml
-polls_049.yml
-polls_110.yml
