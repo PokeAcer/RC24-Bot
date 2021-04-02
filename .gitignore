@@ -31,3 +31,10 @@ target/*
 dependency-reduced-pom.xml
 polls_049.yml
 polls_110.yml
+
+# eclipse
+bin
+.settings
+.metadata
+.classpath
+.project
